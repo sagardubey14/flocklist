@@ -1,6 +1,6 @@
 function App() {
   return (
-    <div>
+    <div className="text-3xl font-bold underline text-blue-400">
       Flock-List
     </div>
   )

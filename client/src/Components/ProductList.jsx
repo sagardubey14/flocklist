@@ -1,27 +1,81 @@
-import React from 'react';
+import React, { useState } from "react";
+import ProductActions from "./ProductActions";
 
-function ProductList({ products, layout = 'grid', onAddProduct }) {
+function ProductList({ products, layout = "grid", onAddProduct }) {
+  const [focusedIndex, setFocusedIndex] = useState(null);
+
+  const handleFocus = (index) => {
+    if (focusedIndex !== index) {
+      setFocusedIndex(index);
+    }
+  };
+
+  const handleClose = () => {
+    setFocusedIndex(null);
+  };
+
   return (
-    <div>
-      <div>
-        <button onClick={onAddProduct}>Add Product</button>
+    <div className="p-4">
+      <div className="mb-4">
+        <button
+          onClick={onAddProduct}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Add Product
+        </button>
       </div>
-      <div>
-        {products.length === 0 ? (
-          <div>No products in this wishlist.</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: layout === 'grid' ? 'row' : 'column', flexWrap: 'wrap' }}>
-            {products.map((product, index) => (
-              <div key={index} style={{ margin: '10px', border: '1px solid black', padding: '10px' }}>
-                <img src={product.image} alt={product.name} width="100" height="100" />
-                <div>Name: {product.name}</div>
-                <div>Price: ${product.price}</div>
-                <div>Added by: {product.addedBy}</div>
+
+      {products.length === 0 ? (
+        <div className="text-gray-500">No products in this wishlist.</div>
+      ) : (
+        <div className="flex flex-wrap -m-2">
+          {products.map((product, index) => {
+            const isFocused = index === focusedIndex;
+            return (
+              <div
+                key={index}
+                className={`p-2 transition-all duration-300 ease-in-out ${
+                  isFocused ? "w-full" : "w-full sm:w-1/2 lg:w-1/3"
+                }`}
+              >
+                <div
+                  onClick={() => !isFocused && handleFocus(index)}
+                  className={`relative h-full border rounded p-4 shadow-sm transition-all duration-300 ${
+                    isFocused
+                      ? "bg-blue-50 border-blue-500 scale-[1.02] shadow-lg"
+                      : "hover:shadow-md cursor-pointer"
+                  }`}
+                >
+                  {isFocused && (
+                    <button
+                      onClick={handleClose}
+                      className="absolute top-2 right-4 text-gray-500 hover:text-red-500 text-xl font-bold z-10"
+                    >
+                      x
+                    </button>
+                  )}
+
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-24 h-24 object-cover mb-4"
+                  />
+                  <div className="font-semibold">Name: {product.name}</div>
+                  <div>Price: ${product.price}</div>
+                  <div className="text-sm text-gray-500">
+                    Added by: {product.addedBy}
+                  </div>
+                  {isFocused && (
+                    <div className="absolute bottom-4 right-4">
+                      <ProductActions />
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

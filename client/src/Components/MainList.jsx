@@ -3,6 +3,7 @@ import WishList from "./WishList";
 import WishlistModal from "./WishlistModal";
 import WishlistHeader from "./WishListHeader";
 import ProductList from "./ProductList";
+import ProductModal from "./ProductModal";
 
 const wishListItems = [
   "New Laptop",
@@ -57,8 +58,28 @@ const mockProducts = [
   
 
 function MainList() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedList, setSelectedList] = useState(null);
+
+
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
+  const mockProductInitialData = {
+    name: 'Sample Product',
+    price: '49.99',
+    imageUrl: 'https://via.placeholder.com/100',
+  };
+
+  const handleProductSave = (product) => {
+    console.log('Saved product:', product);
+    setIsProductModalOpen(false);
+  };
+
+  const handleProductClose = () => {
+    setIsProductModalOpen(false);
+  };
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const mockInitialData = {
     title: "",
     eventDate: "",
@@ -119,7 +140,8 @@ function MainList() {
               alert("delete");
             }}
           />
-          <ProductList  products={mockProducts} layout='list' onAddProduct={()=>alert('addProduct')} />
+          <ProductList  products={mockProducts} onAddProduct={()=>setIsProductModalOpen(true)} />
+          <ProductModal isOpen={isProductModalOpen} onClose={handleProductClose} onSave={handleProductSave} initialData={mockProductInitialData}/>
           </>
         )}
       </div>

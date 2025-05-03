@@ -4,6 +4,7 @@ import WishlistModal from "./WishlistModal";
 import WishlistHeader from "./WishListHeader";
 import ProductList from "./ProductList";
 import ProductModal from "./ProductModal";
+import { useUser } from "../Context/UserContext";
 
 // Dummy Data
 const dummyWishlists = [
@@ -89,7 +90,12 @@ const dummyWishlists = [
 ];
 
 function MainList() {
-  const [wishList, setWishList] = useState(dummyWishlists);
+  const {user, setUser} = useUser();
+  console.log(user);
+  
+  const [wishList, setWishList] = useState(user.wishlist);
+  console.log(wishList);
+  
   const [selectedList, setSelectedList] = useState(null);
   const [isMobileDetailView, setIsMobileDetailView] = useState(false);
 

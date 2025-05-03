@@ -15,7 +15,7 @@ const handleLogin = (req, res) => {
 
 const handleRegister = (req, res) => {
     const { username, email, password } = req.body;
-    const status = addUser({ username, email, password, wishlist: [] })
+    const status = addUser({id:Date.now(), username, email, password, wishlist: [] })
     if (status === 409)
         return res.status(409).json({ message: 'User already exists.' });
 

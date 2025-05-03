@@ -35,7 +35,7 @@ function ProductModal({
           name,
           price,
           image: imageUrl,
-          addedBy: "Sagar",
+          addedBy: user,
         });
     initialData.id
       ? onSave(product, selectedList)
@@ -91,7 +91,7 @@ function ProductModal({
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1 text-[#6B7280]">
-            Creator: {initialData.addedBy ? initialData.addedBy : {user}}
+            Creator: {initialData.addedBy ? initialData.addedBy : user}
           </label>
         </div>
 

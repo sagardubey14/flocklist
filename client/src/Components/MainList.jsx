@@ -6,54 +6,55 @@ import ProductList from "./ProductList";
 import ProductModal from "./ProductModal";
 import { useUser } from "../Context/UserContext";
 import { Navigate } from "react-router-dom";
-import axios from 'axios';
-import io from 'socket.io-client'
+import axios from "axios";
+import io from "socket.io-client";
 
 function MainList() {
   const { user, setUser } = useUser();
-  
+
   if (user === null) {
     return <Navigate to="/" />;
-  }  
+  }
   const [socketInstance, setSocketInstance] = useState(null);
   useEffect(() => {
-    const socket = io('http://localhost:3000', {
+    const socket = io("http://localhost:3000", {
       query: { id: user.id },
     });
     setSocketInstance(socket);
-    socket.on('wishlist:created', (data) => {
+    socket.on("wishlist:created", (data) => {
       console.log(data);
-      setWishList(prev => [...prev, data]);
+      setWishList((prev) => [...prev, data]);
     });
-  
-    socket.on('wishlist:updated', (data) => {
+
+    socket.on("wishlist:updated", (data) => {
       console.log(data);
-      setWishList(prev => prev.map(item => item.id === data.id ? data : item));
+      setWishList((prev) =>
+        prev.map((item) => (item.id === data.id ? data : item))
+      );
     });
-  
-    socket.on('wishlist:deleted', (id) => {
+
+    socket.on("wishlist:deleted", (id) => {
       console.log(id);
-      setWishList(prev => prev.filter(item => item.id !== id));
       if (selectedList === id) {
         setSelectedList(null);
       }
+      setWishList((prev) => prev.filter((item) => item.id !== id));
     });
-  
+
     return () => {
       socket.disconnect();
     };
   }, []);
-  
-  
 
   const [wishList, setWishList] = useState(user.wishlist);
-  
+
   const [selectedList, setSelectedList] = useState(null);
   const [isMobileDetailView, setIsMobileDetailView] = useState(false);
 
   const [mockProductInitialData, setMockProductInitialData] = useState({});
   const [mockInitialData, setMockInitialData] = useState({});
   const [friends, setFreind] = useState();
+  const [idOfUpdatedItem, setIdOfUpdatedItem] = useState(null);
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,16 +66,32 @@ function MainList() {
     { id: 4, name: "Eva" },
   ];
 
+  const sendProductStatus = (Sid) => {
+    const updatedWishlist = wishList.find((w) => w.id === Sid);
+    console.log(updatedWishlist);
+    socketInstance.emit("wishlist:update", updatedWishlist);
+  };
+
+  useEffect(() => {
+    if (idOfUpdatedItem) {
+      sendProductStatus(idOfUpdatedItem);
+      setIdOfUpdatedItem(null);
+    }
+  }, [idOfUpdatedItem]);
+
   const handleSave = async (data, msg) => {
     try {
       if (msg === "new") {
-        socketInstance.emit('wishlist:create', data);
-        data.sharedWith = [...data.sharedWith,{id:user.id, name:user.name} ];
-        await axios.post('http://localhost:3000/wish/create', data);
+        socketInstance.emit("wishlist:create", data);
+        data.sharedWith = [
+          ...data.sharedWith,
+          { id: user.id, name: user.name },
+        ];
+        await axios.post("http://localhost:3000/wish/create", data);
         setWishList((prev) => [...prev, data]);
       } else if (msg === undefined) {
-        socketInstance.emit('wishlist:update', data);
-        await axios.post('http://localhost:3000/wish/update', data);
+        socketInstance.emit("wishlist:update", data);
+        await axios.post("http://localhost:3000/wish/update", data);
         setWishList((prev) =>
           prev.map((item) => (item.id === data.id ? data : item))
         );
@@ -84,15 +101,14 @@ function MainList() {
       console.error("Error saving wish:", error);
     }
   };
-  
 
-  const handleDelete = async (id,sharedWith) => {
-    const data = {wishlistId:id, sharedWith}
+  const handleDelete = async (id, sharedWith) => {
+    const data = { wishlistId: id, sharedWith };
     setSelectedList(null);
     try {
       setWishList(wishList.filter((item) => item.id !== id));
-      socketInstance.emit('wishlist:delete', data);
-      await axios.post('http://localhost:3000/wish/delete', {id});
+      socketInstance.emit("wishlist:delete", data);
+      await axios.post("http://localhost:3000/wish/delete", { id });
     } catch (error) {
       console.error("Error Deleting wish:", error);
     }
@@ -107,10 +123,6 @@ function MainList() {
     setSelectedList(index);
     setIsMobileDetailView(true);
   };
-  const sendProductStatus = (Sid)=>{
-    const updatedWishlist = wishList.find(w=>w.id===(Sid));
-    socketInstance.emit('wishlist:update', updatedWishlist);
-  }
 
   const handleProductSave = (product, id, msg) => {
     setWishList((prev) =>
@@ -125,7 +137,11 @@ function MainList() {
       })
     );
     setIsProductModalOpen(false);
-    sendProductStatus(id);
+    msg
+      ? setTimeout(() => {
+          setIdOfUpdatedItem(id);
+        }, 300)
+      : setIdOfUpdatedItem(id);
   };
 
   const handleProductDelete = (pid, Sid) => {
@@ -139,7 +155,7 @@ function MainList() {
         return item;
       })
     );
-    sendProductStatus(Sid);
+    setIdOfUpdatedItem(Sid);
   };
 
   const handleProductClose = () => {
@@ -147,7 +163,7 @@ function MainList() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
+    <div className="flex flex-col md:flex-row h-screen bg-[#F9FAFB] text-[#111827]">
       {/* Left Panel */}
       <div
         className={`md:w-1/5 w-full p-4 ${
@@ -156,7 +172,7 @@ function MainList() {
       >
         <div className="flex justify-center mb-4">
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-[#6366F1] text-white px-4 py-2 rounded hover:bg-indigo-600 transition"
             onClick={() => setIsModalOpen(true)}
           >
             Create Wishlist
@@ -175,7 +191,7 @@ function MainList() {
       </div>
 
       {/* Divider */}
-      <div className="hidden md:block w-[5px] bg-gray-300"></div>
+      <div className="hidden md:block w-[5px] bg-[#E5E7EB]"></div>
 
       {/* Right Panel */}
       <div
@@ -184,7 +200,7 @@ function MainList() {
         }`}
       >
         <button
-          className={`md:hidden mb-4 text-blue-600 underline`}
+          className="md:hidden mb-4 text-[#6366F1] underline"
           onClick={() => {
             setIsMobileDetailView(false);
             setSelectedList(null);
@@ -194,12 +210,14 @@ function MainList() {
         </button>
 
         {selectedList !== null && (
-          <>
+          <div>
             <WishlistHeader
               wishList={wishList}
               selectedList={selectedList}
               onEdit={() => {
-                setMockInitialData(wishList.find((item) => item.id === selectedList));
+                setMockInitialData(
+                  wishList.find((item) => item.id === selectedList)
+                );
                 setTimeout(() => {
                   setIsModalOpen(true);
                 }, 500);
@@ -216,13 +234,14 @@ function MainList() {
             />
 
             <ProductModal
+              user={user.name}
               selectedList={selectedList}
               isOpen={isProductModalOpen}
               onClose={handleProductClose}
               onSave={handleProductSave}
               initialData={mockProductInitialData}
             />
-          </>
+          </div>
         )}
       </div>
     </div>

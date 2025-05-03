@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 
-function ProductList({ wishList, selectedList, onAddProduct, setMockProductInitialData, onDelete }) {
+function ProductList({
+  wishList,
+  selectedList,
+  onAddProduct,
+  setMockProductInitialData,
+  onDelete,
+}) {
   const [focusedId, setFocusedId] = useState(null);
-  const products = wishList.find(item=>item.id===selectedList).products
+  const products = wishList.find((item) => item.id === selectedList).products;
 
   useEffect(() => {
     setFocusedId(null);
@@ -24,26 +30,26 @@ function ProductList({ wishList, selectedList, onAddProduct, setMockProductIniti
   };
 
   const handleDeleteClick = (product) => {
-    onDelete(product.id, selectedList)
+    onDelete(product.id, selectedList);
     setFocusedId(null);
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-[#F9FAFB] text-[#111827]">
       <div className="mb-4">
         <button
           onClick={() => {
             setMockProductInitialData({});
             onAddProduct();
           }}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="px-4 py-2 bg-[#6366F1] text-white rounded hover:bg-indigo-600 transition"
         >
           Add Product
         </button>
       </div>
 
       {products.length === 0 ? (
-        <div className="text-gray-500">No products in this wishlist.</div>
+        <div className="text-[#6B7280]">No products in this wishlist.</div>
       ) : (
         <div className="flex flex-wrap -m-2">
           {products.map((product) => {
@@ -59,18 +65,18 @@ function ProductList({ wishList, selectedList, onAddProduct, setMockProductIniti
                 <div
                   onClick={() => (!isFocused ? handleFocus(product.id) : null)}
                   className={`relative border rounded shadow-sm cursor-pointer transition-all duration-500 ease-in-out overflow-hidden
-                    ${
-                      isFocused
-                        ? "bg-blue-50 border-blue-500 scale-[1.05] p-6"
-                        : "hover:shadow-md p-3"
-                    }
-                    flex flex-col sm:block
-                  `}
+                ${
+                  isFocused
+                    ? "bg-indigo-50 border-[#6366F1] scale-[1.05] p-6"
+                    : "hover:shadow-md p-3 border-[#E5E7EB] bg-white"
+                }
+                flex flex-col sm:block
+              `}
                 >
                   {isFocused && (
                     <button
                       onClick={handleClose}
-                      className="absolute top-2 right-4 text-gray-500 hover:text-red-500 text-xl font-bold z-10"
+                      className="absolute top-2 right-4 text-[#6B7280] hover:text-[#EF4444] text-xl font-bold z-10"
                     >
                       ×
                     </button>
@@ -99,7 +105,7 @@ function ProductList({ wishList, selectedList, onAddProduct, setMockProductIniti
                         Price: ${product.price}
                       </div>
                       {isFocused && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-[#6B7280]">
                           Added by: {product.addedBy}
                         </div>
                       )}
@@ -110,13 +116,13 @@ function ProductList({ wishList, selectedList, onAddProduct, setMockProductIniti
                     <div className="mt-4 flex justify-center sm:absolute sm:bottom-4 sm:right-4 gap-2">
                       <button
                         onClick={() => handleEditClick(product)}
-                        className="px-3 py-1.5 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition"
+                        className="px-3 py-1.5 bg-[#10B981] text-white text-sm rounded hover:bg-emerald-600 transition"
                       >
                         Edit Product
                       </button>
                       <button
                         onClick={() => handleDeleteClick(product)}
-                        className="px-3 py-1.5 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
+                        className="px-3 py-1.5 bg-[#EF4444] text-white text-sm rounded hover:bg-red-600 transition"
                       >
                         Delete Product
                       </button>

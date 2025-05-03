@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-function ProductModal({ selectedList, isOpen, onClose, onSave, initialData = {} }) {
+function ProductModal({
+  user,
+  selectedList,
+  isOpen,
+  onClose,
+  onSave,
+  initialData = {},
+}) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -15,84 +22,88 @@ function ProductModal({ selectedList, isOpen, onClose, onSave, initialData = {} 
 
   const handleSave = () => {
     let product;
-    initialData.id ?
-    product = {
-      id: initialData.id,
-      name,
-      price,
-      image:imageUrl,
-      addedBy:initialData.addedBy,
-    }:
-    product = {
-      id: Date.now(),
-      name,
-      price,
-      image:imageUrl,
-      addedBy:"Sagar",
-    };
-    initialData.id?
-    onSave(product, selectedList):
-    onSave(product, selectedList, "new");
+    initialData.id
+      ? (product = {
+          id: initialData.id,
+          name,
+          price,
+          image: imageUrl,
+          addedBy: initialData.addedBy,
+        })
+      : (product = {
+          id: Date.now(),
+          name,
+          price,
+          image: imageUrl,
+          addedBy: "Sagar",
+        });
+    initialData.id
+      ? onSave(product, selectedList)
+      : onSave(product, selectedList, "new");
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center border-r-gray-500 bg-[rgba(0,0,0,0.7)]">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6">
-        <h3 className="text-xl font-semibold mb-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.7)]">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6 border border-[#E5E7EB]">
+        <h3 className="text-xl font-semibold mb-4 text-[#111827]">
           {initialData && Object.keys(initialData).length > 0
             ? "Edit Product"
             : "Add Product"}
         </h3>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Name:</label>
+          <label className="block text-sm font-medium mb-1 text-[#111827]">
+            Name:
+          </label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full border border-[#E5E7EB] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Price:</label>
+          <label className="block text-sm font-medium mb-1 text-[#111827]">
+            Price:
+          </label>
           <input
             type="number"
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full border border-[#E5E7EB] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
             value={price}
             onChange={(e) => setPrice(Number(e.target.value))}
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Image URL:</label>
+          <label className="block text-sm font-medium mb-1 text-[#111827]">
+            Image URL:
+          </label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full border border-[#E5E7EB] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#6366F1]"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
           />
         </div>
+
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">
-            Creator:{" "}
-            {initialData.addedBy
-              ? initialData.addedBy
-              : "Sagar"}
+          <label className="block text-sm font-medium mb-1 text-[#6B7280]">
+            Creator: {initialData.addedBy ? initialData.addedBy : {user}}
           </label>
         </div>
 
         <div className="flex justify-end space-x-3">
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-[#6366F1] text-white rounded hover:bg-indigo-600 transition"
             onClick={handleSave}
           >
             Save
           </button>
           <button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+            className="px-4 py-2 bg-[#E5E7EB] text-[#374151] rounded hover:bg-[#D1D5DB] transition"
             onClick={onClose}
           >
             Cancel

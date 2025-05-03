@@ -4,7 +4,7 @@ import MainList from "./Components/MainList";
 
 function App() {
   return (
-    <div className="bg-gray-100">
+    <div className="bg-[#E5E7EB]">
       <div>
         <Routes>
           <Route path="/" element={<Auth />} />

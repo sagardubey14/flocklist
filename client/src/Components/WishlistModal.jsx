@@ -24,27 +24,27 @@ function WishlistModal({
 
   const handleSave = () => {
     let data;
-    initialData.id ?
-    data = {
-      id: initialData.id,
-      title,
-      dateCreated: eventDate,
-      isShared,
-      sharedWith: invitedFriends,
-      products: initialData.products,
-    }:
-    data = {
-      id: Date.now(),
-      title,
-      dateCreated: eventDate,
-      isShared,
-      sharedWith: invitedFriends,
-      products: [],
-    };
+    if (initialData.id) {
+      data = {
+        id: initialData.id,
+        title,
+        dateCreated: eventDate,
+        isShared,
+        sharedWith: invitedFriends,
+        products: initialData.products,
+      };
+    } else {
+      data = {
+        id: Date.now(),
+        title,
+        dateCreated: eventDate,
+        isShared,
+        sharedWith: invitedFriends,
+        products: [],
+      };
+    }
 
-    initialData.id?
-    onSave(data):
-    onSave(data,"new");
+    initialData.id ? onSave(data) : onSave(data, "new");
   };
 
   const handleInvite = (friend) => {
@@ -67,26 +67,30 @@ function WishlistModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.7)]">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-xl mx-4 p-6 overflow-y-auto max-h-[90vh]">
-        <h3 className="text-xl font-semibold mb-4">
+      <div className="bg-[#F9FAFB] rounded-lg shadow-lg w-full max-w-xl mx-4 p-6 overflow-y-auto max-h-[90vh]">
+        <h3 className="text-xl font-semibold text-[#1F2937] mb-4">
           {initialData.title ? "Edit Wishlist" : "Add Wishlist"}
         </h3>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Title:</label>
+          <label className="block text-sm font-medium mb-1 text-[#6B7280]">
+            Title:
+          </label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full border border-[#E5E7EB] rounded px-3 py-2 focus:outline-none focus:ring focus:border-[#6366F1]"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Event Date:</label>
+          <label className="block text-sm font-medium mb-1 text-[#6B7280]">
+            Event Date:
+          </label>
           <input
             type="date"
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full border border-[#E5E7EB] rounded px-3 py-2 focus:outline-none focus:ring focus:border-[#6366F1]"
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
           />
@@ -95,27 +99,29 @@ function WishlistModal({
         <div className="mb-4 flex items-center space-x-2">
           <input
             type="checkbox"
-            className="form-checkbox h-4 w-4 text-blue-600"
+            className="form-checkbox h-4 w-4 text-[#6366F1]"
             checked={isShared}
-            disabled={initialData.isShared} 
+            disabled={initialData.isShared}
             onChange={(e) => setIsShared(e.target.checked)}
           />
-          <label className="text-sm">Shared</label>
+          <label className="text-sm text-[#6B7280]">Shared</label>
         </div>
 
         {isShared && (
           <div className="mb-6">
             <div>
-              <h5 className="font-medium mb-1">Invited Friends:</h5>
+              <h5 className="font-medium text-[#111827] mb-1">
+                Invited Friends:
+              </h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-40 overflow-y-auto">
                 {invitedFriends.map((friend) => (
                   <div
                     key={friend.id}
-                    className="flex justify-between items-center p-2 bg-gray-200 rounded"
+                    className="flex justify-between items-center p-2 bg-[#E5E7EB] rounded"
                   >
-                    <span>{friend.name}</span>
+                    <span className="text-[#111827]">{friend.name}</span>
                     <button
-                      className="text-sm text-white bg-red-500 px-2 py-1 rounded hover:bg-red-600"
+                      className="text-sm text-white bg-[#EF4444] px-2 py-1 rounded hover:bg-red-600"
                       onClick={() => handleRemoveFriend(friend.id)}
                     >
                       Remove
@@ -124,28 +130,30 @@ function WishlistModal({
                 ))}
               </div>
             </div>
-            <h4 className="text-lg font-semibold mb-2">Invite Friends</h4>
+            <h4 className="text-lg font-semibold text-[#111827] mb-2">
+              Invite Friends
+            </h4>
 
             <input
               type="text"
               placeholder="Search friends..."
-              className="w-full mb-3 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+              className="w-full mb-3 border border-[#E5E7EB] rounded px-3 py-2 focus:outline-none focus:ring focus:border-[#6366F1]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 max-h-40 overflow-y-auto">
               {filteredFriends.length === 0 && (
-                <p className="text-sm text-gray-500">No friends found.</p>
+                <p className="text-sm text-[#6B7280]">No friends found.</p>
               )}
               {filteredFriends.map((friend) => (
                 <div
                   key={friend.id}
-                  className="flex justify-between items-center p-2 bg-gray-100 rounded"
+                  className="flex justify-between items-center p-2 bg-[#E5E7EB] rounded"
                 >
-                  <span>{friend.name}</span>
+                  <span className="text-[#111827]">{friend.name}</span>
                   <button
-                    className="text-sm text-white bg-green-500 px-2 py-1 rounded hover:bg-green-600"
+                    className="text-sm text-white bg-[#10B981] px-2 py-1 rounded hover:bg-green-600"
                     onClick={() => handleInvite(friend)}
                   >
                     Add
@@ -158,13 +166,13 @@ function WishlistModal({
 
         <div className="flex justify-end space-x-3">
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-[#6366F1] text-white rounded hover:bg-indigo-600 transition"
             onClick={handleSave}
           >
             Save
           </button>
           <button
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+            className="px-4 py-2 bg-[#E5E7EB] text-[#111827] rounded hover:bg-[#D1D5DB] transition"
             onClick={onClose}
           >
             Cancel

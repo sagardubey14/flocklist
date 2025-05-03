@@ -10,11 +10,11 @@ function SharedUsersSection({ users, setShowUSers }) {
   }
 
   return (
-    <div className="absolute top-full mt-2 -left-4.5 sm:-left-6 z-20 w-38 sm:w-50 bg-white p-4 sm:p-6 rounded-lg shadow-lg">
+    <div className="absolute top-full mt-2 -left-4.5 sm:-left-6 z-20 w-38 sm:w-50 bg-white p-4 sm:p-6 rounded-lg shadow-lg border border-[#E5E7EB]">
       {/* Close Button */}
       <button
         onClick={() => setShowUSers(false)}
-        className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-lg font-bold"
+        className="absolute top-2 right-2 text-[#6B7280] hover:text-[#EF4444] text-lg font-bold"
         aria-label="Close"
       >
         ×
@@ -27,7 +27,7 @@ function SharedUsersSection({ users, setShowUSers }) {
             alt={user.name}
             className="rounded-full w-8 h-8 sm:w-10 sm:h-10"
           />
-          <div className="ml-3 sm:ml-4 text-sm sm:text-base text-gray-700 font-medium">
+          <div className="ml-3 sm:ml-4 text-sm sm:text-base text-[#111827] font-medium">
             {user.name}
           </div>
         </div>

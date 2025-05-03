@@ -1,7 +1,8 @@
 import { useState } from "react";
 import SharedUsersSection from "./SharedUsersSection";
 
-function WishlistHeader({ title, eventDate, isShared, onEdit, onDelete, users }) {
+function WishlistHeader({ wishList, selectedList, onEdit, onDelete }) {
+  const {title, dateCreated, isShared, sharedWith} = wishList.find(item=> item.id === selectedList)
   const [showUsers, setShowUSers] = useState(false);
 
   return (
@@ -9,7 +10,7 @@ function WishlistHeader({ title, eventDate, isShared, onEdit, onDelete, users })
       {/* Title and Date Section */}
       <div className="flex flex-col">
         <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-        <div className="text-sm text-gray-500">Event Date: {eventDate}</div>
+        <div className="text-sm text-gray-500">Event Date: {dateCreated}</div>
       </div>
 
       {/* Row for Privacy and Buttons */}
@@ -26,7 +27,7 @@ function WishlistHeader({ title, eventDate, isShared, onEdit, onDelete, users })
           Privacy: {isShared ? "Shared" : "Private"}
         </div>
         {showUsers && (
-          <SharedUsersSection users={users} setShowUSers={setShowUSers} />
+          <SharedUsersSection users={sharedWith} setShowUSers={setShowUSers} />
         )}
         {/* Action Buttons */}
         <div className="flex gap-2">
@@ -37,7 +38,7 @@ function WishlistHeader({ title, eventDate, isShared, onEdit, onDelete, users })
             Edit
           </button>
           <button
-            onClick={onDelete}
+            onClick={()=>onDelete(selectedList)}
             className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
           >
             Delete

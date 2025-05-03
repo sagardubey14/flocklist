@@ -5,13 +5,17 @@ import WishlistHeader from "./WishListHeader";
 import ProductList from "./ProductList";
 import ProductModal from "./ProductModal";
 
+// Dummy Data
 const dummyWishlists = [
   {
     id: 1,
     title: "New Laptop",
     dateCreated: "2024-11-01",
     isShared: true,
-    sharedWith: [{id:1, name:"Alice"}, {id:2, name:"Bob"}],
+    sharedWith: [
+      { id: 1, name: "Alice" },
+      { id: 2, name: "Bob" },
+    ],
     products: [
       {
         id: 1,
@@ -50,7 +54,10 @@ const dummyWishlists = [
     title: "Gaming Console",
     dateCreated: "2025-01-15",
     isShared: true,
-    sharedWith: [{id:3, name:"Charlie"}, {id:4, name:"Eva"}],
+    sharedWith: [
+      { id: 3, name: "Charlie" },
+      { id: 4, name: "Eva" },
+    ],
     products: [
       {
         id: 4,
@@ -73,7 +80,10 @@ const dummyWishlists = [
     title: "New key",
     dateCreated: "2024-11-01",
     isShared: true,
-    sharedWith: [{id:1, name:"Alice"}, {id:2, name:"Bob"}],
+    sharedWith: [
+      { id: 1, name: "Alice" },
+      { id: 2, name: "Bob" },
+    ],
     products: [],
   },
 ];
@@ -82,52 +92,72 @@ function MainList() {
   const [wishList, setWishList] = useState(dummyWishlists);
   const [selectedList, setSelectedList] = useState(null);
   const [isMobileDetailView, setIsMobileDetailView] = useState(false);
-  const [mockProductInitialData, setMockProductInitialData] = useState({});
 
-  useEffect(() => {
-    console.log(mockProductInitialData);
-  }, [mockProductInitialData]);
+  const [mockProductInitialData, setMockProductInitialData] = useState({});
+  const [mockInitialData, setMockInitialData] = useState({});
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-
-  const handleProductSave = (product) => {
-    console.log("Saved product:", product);
-    setIsProductModalOpen(false);
-  };
-
-  const handleProductClose = () => {
-    setIsProductModalOpen(false);
-  };
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const mockInitialData = {
-    title: "",
-    eventDate: "",
-    isShared: false,
-    invitedFriends: [],
-  };
 
   const mockAllFriends = [
     { id: 1, name: "Alice" },
     { id: 2, name: "Bob" },
     { id: 3, name: "Charlie" },
-    { id: 4, name: "David" },
-    { id: 5, name: "Eva" },
+    { id: 4, name: "Eva" },
   ];
 
-  const handleSave = (data) => {
-    console.log("Wishlist Saved:", data);
+  const handleSave = (data, msg) => {
+    msg === "new"
+      ? setWishList((prev) => [...prev, data])
+      : setWishList((prev) => prev.map((item) => (item.id === data.id ? data : item)));
     setIsModalOpen(false);
   };
 
+  const handleDelete = (id) => {
+    setWishList(wishList.filter((item) => item.id !== id));
+    setSelectedList(null);
+  };
+
   const handleClose = () => {
+    setMockInitialData({});
     setIsModalOpen(false);
   };
 
   const handleSelectList = (index) => {
-    // console.log(wishList.find(item=>item.id === index));
-    setSelectedList(wishList.find(item=>item.id === index));
+    setSelectedList(index);
     setIsMobileDetailView(true);
+  };
+
+  const handleProductSave = (product, id, msg) => {
+    setWishList((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const updatedProducts = msg
+            ? [...item.products, product]
+            : item.products.map((pd) => (pd.id === product.id ? product : pd));
+          return { ...item, products: updatedProducts };
+        }
+        return item;
+      })
+    );
+    setIsProductModalOpen(false);
+  };
+
+  const handleProductDelete = (pid, Sid) => {
+    setWishList((prev) =>
+      prev.map((item) => {
+        if (item.id === Sid) {
+          const updatedProducts = item.products.filter((p) => p.id !== pid);
+          console.log(updatedProducts);
+          return { ...item, products: updatedProducts };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleProductClose = () => {
+    setIsProductModalOpen(false);
   };
 
   return (
@@ -155,10 +185,7 @@ function MainList() {
           allFriends={mockAllFriends}
         />
 
-        <WishList
-          wishListItems={wishList}
-          setSelectedList={handleSelectList}
-        />
+        <WishList wishListItems={wishList} setSelectedList={handleSelectList} />
       </div>
 
       {/* Divider */}
@@ -170,9 +197,8 @@ function MainList() {
           selectedList !== null ? "block" : "hidden md:block"
         }`}
       >
-        {/* Mobile Back Button */}
         <button
-          className="md:hidden mb-4 text-blue-600 underline"
+          className={`md:hidden mb-4 text-blue-600 underline`}
           onClick={() => {
             setIsMobileDetailView(false);
             setSelectedList(null);
@@ -184,20 +210,27 @@ function MainList() {
         {selectedList !== null && (
           <>
             <WishlistHeader
-              title={selectedList.title}
-              eventDate={selectedList.dateCreated}
-              isShared={selectedList.isShared}
-              onEdit={() => alert("edit")}
-              onDelete={() => alert("delete")}
-              users={selectedList.sharedWith}
+              wishList={wishList}
+              selectedList={selectedList}
+              onEdit={() => {
+                setMockInitialData(wishList.find((item) => item.id === selectedList));
+                setTimeout(() => {
+                  setIsModalOpen(true);
+                }, 500);
+              }}
+              onDelete={handleDelete}
             />
 
             <ProductList
-              products={selectedList.products}
+              wishList={wishList}
+              selectedList={selectedList}
               onAddProduct={() => setIsProductModalOpen(true)}
               setMockProductInitialData={setMockProductInitialData}
+              onDelete={handleProductDelete}
             />
+
             <ProductModal
+              selectedList={selectedList}
               isOpen={isProductModalOpen}
               onClose={handleProductClose}
               onSave={handleProductSave}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-function ProductModal({ isOpen, onClose, onSave, initialData = {} }) {
+function ProductModal({ selectedList, isOpen, onClose, onSave, initialData = {} }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -14,12 +14,25 @@ function ProductModal({ isOpen, onClose, onSave, initialData = {} }) {
   }, [initialData]);
 
   const handleSave = () => {
-    const product = {
+    let product;
+    initialData.id ?
+    product = {
+      id: initialData.id,
       name,
       price,
-      imageUrl,
+      image:imageUrl,
+      addedBy:initialData.addedBy,
+    }:
+    product = {
+      id: Date.now(),
+      name,
+      price,
+      image:imageUrl,
+      addedBy:"Sagar",
     };
-    onSave(product);
+    initialData.id?
+    onSave(product, selectedList):
+    onSave(product, selectedList, "new");
   };
 
   if (!isOpen) return null;
@@ -49,7 +62,7 @@ function ProductModal({ isOpen, onClose, onSave, initialData = {} }) {
             type="number"
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={(e) => setPrice(Number(e.target.value))}
           />
         </div>
 

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-function ProductList({ products, onAddProduct, setMockProductInitialData }) {
+function ProductList({ wishList, selectedList, onAddProduct, setMockProductInitialData, onDelete }) {
   const [focusedId, setFocusedId] = useState(null);
+  const products = wishList.find(item=>item.id===selectedList).products
 
-  useEffect(()=>{  
-    setFocusedId(null)
-  },[products[0]])
-  
+  useEffect(() => {
+    setFocusedId(null);
+  }, [products[0]]);
+
   const handleFocus = (id) => {
     if (focusedId !== id) {
       setFocusedId(id);
@@ -23,19 +24,15 @@ function ProductList({ products, onAddProduct, setMockProductInitialData }) {
   };
 
   const handleDeleteClick = (product) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${product.name}?`
-    );
-    if (confirmed) {
-      alert(`Delete of Product: ${product.name}`);
-    }
+    onDelete(product.id, selectedList)
+    setFocusedId(null);
   };
 
   return (
     <div className="p-4">
       <div className="mb-4">
         <button
-          onClick={()=>{
+          onClick={() => {
             setMockProductInitialData({});
             onAddProduct();
           }}

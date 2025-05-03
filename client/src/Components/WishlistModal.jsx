@@ -16,20 +16,35 @@ function WishlistModal({
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || "");
-      setEventDate(initialData.eventDate || "");
+      setEventDate(initialData.dateCreated || "");
       setIsShared(initialData.isShared || false);
-      setInvitedFriends(initialData.invitedFriends || []);
+      setInvitedFriends(initialData.sharedWith || []);
     }
   }, [initialData]);
 
   const handleSave = () => {
-    const data = {
+    let data;
+    initialData.id ?
+    data = {
+      id: initialData.id,
       title,
-      eventDate,
+      dateCreated: eventDate,
       isShared,
-      invitedFriends,
+      sharedWith: invitedFriends,
+      products: initialData.products,
+    }:
+    data = {
+      id: Date.now(),
+      title,
+      dateCreated: eventDate,
+      isShared,
+      sharedWith: invitedFriends,
+      products: [],
     };
-    onSave(data);
+
+    initialData.id?
+    onSave(data):
+    onSave(data,"new");
   };
 
   const handleInvite = (friend) => {
@@ -82,6 +97,7 @@ function WishlistModal({
             type="checkbox"
             className="form-checkbox h-4 w-4 text-blue-600"
             checked={isShared}
+            disabled={initialData.isShared} 
             onChange={(e) => setIsShared(e.target.checked)}
           />
           <label className="text-sm">Shared</label>

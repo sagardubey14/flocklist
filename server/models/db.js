@@ -154,8 +154,13 @@ const getWishList = (arr) => {
     return WishList.filter(wishlist => arr.includes(wishlist.id));
 }
 
+const getUserWishes = (id)=>{
+    const user = Users.find(u=>u.id===id)
+    return {id:user.id, name:user.username};
+}
+
 const getData = (req, res) => {
     return res.status(200).json({ data: Users, wishlist: WishList });
 }
 
-module.exports = { getUser, addUser, getData, getWishList, addWish, deleteWish }
+module.exports = { getUser, addUser, getData, getWishList, addWish, deleteWish, getUserWishes }

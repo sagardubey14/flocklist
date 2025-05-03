@@ -7,98 +7,46 @@ import ProductModal from "./ProductModal";
 import { useUser } from "../Context/UserContext";
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
-
-// Dummy Data
-const dummyWishlists = [
-  {
-    id: 1,
-    title: "New Laptop",
-    dateCreated: "2024-11-01",
-    isShared: true,
-    sharedWith: [
-      { id: 1, name: "Alice" },
-      { id: 2, name: "Bob" },
-    ],
-    products: [
-      {
-        id: 1,
-        name: "Wireless Mouse",
-        price: 25.99,
-        image: "./icons8-list-32.png",
-        addedBy: "Alice",
-      },
-      {
-        id: 2,
-        name: "Bluetooth Headphones",
-        price: 59.99,
-        image: "./icons8-list-32.png",
-        addedBy: "Bob",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Vacation to Japan",
-    dateCreated: "2024-12-10",
-    isShared: false,
-    sharedWith: [],
-    products: [
-      {
-        id: 3,
-        name: "Travel Backpack",
-        price: 45.99,
-        image: "./icons8-list-32.png",
-        addedBy: "Charlie",
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Gaming Console",
-    dateCreated: "2025-01-15",
-    isShared: true,
-    sharedWith: [
-      { id: 3, name: "Charlie" },
-      { id: 4, name: "Eva" },
-    ],
-    products: [
-      {
-        id: 4,
-        name: "Game Controller",
-        price: 49.99,
-        image: "./icons8-list-32.png",
-        addedBy: "Eva",
-      },
-      {
-        id: 5,
-        name: "HDMI Cable",
-        price: 9.99,
-        image: "./icons8-list-32.png",
-        addedBy: "Charlie",
-      },
-    ],
-  },
-  {
-    id: 99,
-    title: "New key",
-    dateCreated: "2024-11-01",
-    isShared: true,
-    sharedWith: [
-      { id: 1, name: "Alice" },
-      { id: 2, name: "Bob" },
-    ],
-    products: [],
-  },
-];
+import io from 'socket.io-client'
 
 function MainList() {
   const { user, setUser } = useUser();
+  
   if (user === null) {
     return <Navigate to="/" />;
   }  
+  const [socketInstance, setSocketInstance] = useState(null);
+  useEffect(() => {
+    const socket = io('http://localhost:3000', {
+      query: { id: user.id },
+    });
+    setSocketInstance(socket);
+    socket.on('wishlist:created', (data) => {
+      console.log(data);
+      setWishList(prev => [...prev, data]);
+    });
   
+    socket.on('wishlist:updated', (data) => {
+      console.log(data);
+      setWishList(prev => prev.map(item => item.id === data.id ? data : item));
+    });
+  
+    socket.on('wishlist:deleted', (id) => {
+      console.log(id);
+      setWishList(prev => prev.filter(item => item.id !== id));
+      if (selectedList === id) {
+        setSelectedList(null);
+      }
+    });
+  
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+  
+  
+
   const [wishList, setWishList] = useState(user.wishlist);
-  console.log(wishList);
   
   const [selectedList, setSelectedList] = useState(null);
   const [isMobileDetailView, setIsMobileDetailView] = useState(false);
@@ -120,10 +68,12 @@ function MainList() {
   const handleSave = async (data, msg) => {
     try {
       if (msg === "new") {
-        data.sharedWith = [...data.sharedWith,{id:user.id, name:user.name} ]
+        socketInstance.emit('wishlist:create', data);
+        data.sharedWith = [...data.sharedWith,{id:user.id, name:user.name} ];
         await axios.post('http://localhost:3000/wish/create', data);
         setWishList((prev) => [...prev, data]);
       } else if (msg === undefined) {
+        socketInstance.emit('wishlist:update', data);
         await axios.post('http://localhost:3000/wish/update', data);
         setWishList((prev) =>
           prev.map((item) => (item.id === data.id ? data : item))
@@ -136,13 +86,15 @@ function MainList() {
   };
   
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id,sharedWith) => {
+    const data = {wishlistId:id, sharedWith}
     setSelectedList(null);
     try {
       setWishList(wishList.filter((item) => item.id !== id));
+      socketInstance.emit('wishlist:delete', data);
       await axios.post('http://localhost:3000/wish/delete', {id});
     } catch (error) {
-      console.error("Error saving wish:", error);
+      console.error("Error Deleting wish:", error);
     }
   };
 
@@ -155,6 +107,10 @@ function MainList() {
     setSelectedList(index);
     setIsMobileDetailView(true);
   };
+  const sendProductStatus = (Sid)=>{
+    const updatedWishlist = wishList.find(w=>w.id===(Sid));
+    socketInstance.emit('wishlist:update', updatedWishlist);
+  }
 
   const handleProductSave = (product, id, msg) => {
     setWishList((prev) =>
@@ -169,6 +125,7 @@ function MainList() {
       })
     );
     setIsProductModalOpen(false);
+    sendProductStatus(id);
   };
 
   const handleProductDelete = (pid, Sid) => {
@@ -182,6 +139,7 @@ function MainList() {
         return item;
       })
     );
+    sendProductStatus(Sid);
   };
 
   const handleProductClose = () => {

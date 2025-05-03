@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 router.post('/create', handleWishCreation);
-router.post('/upadte', handleWishUpdation);
+router.post('/update', handleWishUpdation);
 router.post('/delete', handleWishDeletion);
 
 module.exports = router;

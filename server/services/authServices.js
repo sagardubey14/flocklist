@@ -9,7 +9,7 @@ const handleLogin = (req, res) => {
     if (user.password !== password)
         return res.status(401).json({ message: 'Invalid username or password.' });
 
-    return res.status(200).json({ message: 'User Registered Successfully.', username: user.username, wishlist: getWishList(user.wishlist) });
+    return res.status(200).json({ message: 'User Registered Successfully.', id:user.id, username: user.username, wishlist: getWishList(user.wishlist) });
 }
 
 

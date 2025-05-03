@@ -6,12 +6,14 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 const authRoutes = require('./routes/authRoutes');
+const wishRoutes = require('./routes/wishRoutes');
 const { getData } = require('./models/db');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use('/auth', authRoutes);
+app.use('/wish', wishRoutes)
 
 // Socket.IO setup
 const io = socketIO(server, {

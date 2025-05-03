@@ -36,7 +36,7 @@ function Auth() {
           password: formData.password,
         });
         console.log("Login Success:", res.data);
-        setUser({ username: res.data.username, wishlist: res.data.wishlist });
+        setUser({id:res.data.id, name: res.data.username, wishlist: res.data.wishlist });
       }
     } catch (err) {
       console.error("Auth error:", err.response?.data || err.message);

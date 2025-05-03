@@ -117,10 +117,6 @@ const getUser = (email) => {
     return user
 }
 
-const getWishList = (arr) => {
-    return WishList.filter(wishlist => arr.includes(wishlist.id));
-}
-
 const addUser = (element) => {
     const user = Users.find(user => user.email === element.email)
     if (user) return 409;
@@ -128,8 +124,38 @@ const addUser = (element) => {
     return 200;
 }
 
+const addWish = (element, msg)=>{
+    console.log(element,"addWish");
+    if(msg) 
+        WishList.filter(wish=>wish.id !== element.id);
+    WishList.push(element);
+    element.sharedWith.forEach(sharedUser => {
+        const user = Users.find(u => u.id === sharedUser.id);
+        if (user && !user.wishlist.includes(element.id)) {
+            user.wishlist.push(element.id);
+        }
+    });
+    return 200;
+}
+const deleteWish = (id) => {
+    const deletedWish = WishList.find(w => w.id === id);
+    if (!deletedWish) return;
+
+    deletedWish.sharedWith.forEach(sharedUser => {
+        const user = Users.find(u => u.id === sharedUser.id);
+        if (user) {
+            user.wishlist = user.wishlist.filter(wishId => wishId !== id);
+        }
+    });
+};
+
+
+const getWishList = (arr) => {
+    return WishList.filter(wishlist => arr.includes(wishlist.id));
+}
+
 const getData = (req, res) => {
     return res.status(200).json({ data: Users, wishlist: WishList });
 }
 
-module.exports = { getUser, addUser, getData, getWishList }
+module.exports = { getUser, addUser, getData, getWishList, addWish, deleteWish }

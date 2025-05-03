@@ -5,6 +5,8 @@ import WishlistHeader from "./WishListHeader";
 import ProductList from "./ProductList";
 import ProductModal from "./ProductModal";
 import { useUser } from "../Context/UserContext";
+import { Navigate } from "react-router-dom";
+import axios from 'axios';
 
 // Dummy Data
 const dummyWishlists = [
@@ -90,8 +92,10 @@ const dummyWishlists = [
 ];
 
 function MainList() {
-  const {user, setUser} = useUser();
-  console.log(user);
+  const { user, setUser } = useUser();
+  if (user === null) {
+    return <Navigate to="/" />;
+  }  
   
   const [wishList, setWishList] = useState(user.wishlist);
   console.log(wishList);
@@ -101,6 +105,7 @@ function MainList() {
 
   const [mockProductInitialData, setMockProductInitialData] = useState({});
   const [mockInitialData, setMockInitialData] = useState({});
+  const [friends, setFreind] = useState();
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,16 +117,33 @@ function MainList() {
     { id: 4, name: "Eva" },
   ];
 
-  const handleSave = (data, msg) => {
-    msg === "new"
-      ? setWishList((prev) => [...prev, data])
-      : setWishList((prev) => prev.map((item) => (item.id === data.id ? data : item)));
-    setIsModalOpen(false);
+  const handleSave = async (data, msg) => {
+    try {
+      if (msg === "new") {
+        data.sharedWith = [...data.sharedWith,{id:user.id, name:user.name} ]
+        await axios.post('http://localhost:3000/wish/create', data);
+        setWishList((prev) => [...prev, data]);
+      } else if (msg === undefined) {
+        await axios.post('http://localhost:3000/wish/update', data);
+        setWishList((prev) =>
+          prev.map((item) => (item.id === data.id ? data : item))
+        );
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error saving wish:", error);
+    }
   };
+  
 
-  const handleDelete = (id) => {
-    setWishList(wishList.filter((item) => item.id !== id));
+  const handleDelete = async (id) => {
     setSelectedList(null);
+    try {
+      setWishList(wishList.filter((item) => item.id !== id));
+      await axios.post('http://localhost:3000/wish/delete', {id});
+    } catch (error) {
+      console.error("Error saving wish:", error);
+    }
   };
 
   const handleClose = () => {
